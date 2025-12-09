@@ -16,14 +16,21 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.contractorconnect.app"
+      "bundleIdentifier": "com.contractorconnect.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#2563eb"
       },
-      "package": "com.contractorconnect.app"
+      "package": "com.contractorconnect.app",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -40,8 +47,13 @@
         {
           "photosPermission": "Allow ContractorConnect to access your photos to upload project images."
         }
-      ]
-    ]
+      ],
+      "expo-secure-store"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "624a235c-97c0-4364-a80e-a58a7d2187f5"
+      }
+    }
   }
 }
-
