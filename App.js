@@ -1,11 +1,13 @@
 Import React, { useState, useEffect, useRef } from 'react';
 import { 
   View, Text, TextInput, TouchableOpacity, ScrollView, Image, 
-  Modal, Alert, SafeAreaView, Platform, KeyboardAvoidingView, StatusBar as RNStatusBar
+  Modal, Alert, SafeAreaView, Platform, KeyboardAvoidingView, StatusBar as RNStatusBar,
+  ActivityIndicator
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+import { supabase } from './lib/supabase';
 import { styled } from 'nativewind';
 import { 
   Hammer, Home, MessageSquare, FileText, User, Camera, Send, 
@@ -644,6 +646,79 @@ export default function App() {
 
   const AuthScreen = () => {
     const [isLogin, setIsLogin] = useState(false);
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleLogin = async () => {
+      if (!email.trim() || !password.trim()) {
+        Alert.alert('Error', 'Por favor ingresa email y contraseña.');
+        return;
+      }
+      
+      setLoading(true);
+      try {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password: password.trim(),
+        });
+        
+        if (error) {
+          Alert.alert('Error de Autenticación', error.message);
+        } else {
+          handleAuthSuccess();
+        }
+      } catch (err) {
+        Alert.alert('Error', err.message || 'Error inesperado durante el login.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const handleSignUp = async () => {
+      if (!name.trim() || !email.trim() || !password.trim()) {
+        Alert.alert('Error', 'Por favor completa todos los campos.');
+        return;
+      }
+      
+      if (password.trim().length < 6) {
+        Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres.');
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const { error } = await supabase.auth.signUp({
+          email: email.trim(),
+          password: password.trim(),
+          options: {
+            data: {
+              full_name: name.trim(),
+              role: role,
+            },
+          },
+        });
+
+        if (error) {
+          Alert.alert('Error de Registro', error.message);
+        } else {
+          Alert.alert(
+            'Registro Exitoso',
+            'Verifica tu correo electrónico para confirmar tu cuenta.',
+            [{ text: 'OK', onPress: () => setIsLogin(true) }]
+          );
+          setEmail('');
+          setPassword('');
+          setName('');
+        }
+      } catch (err) {
+        Alert.alert('Error', err.message || 'Error inesperado durante el registro.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     return (
       <SafeAreaView className="flex-1 bg-white">
         <View className="flex-1 p-6 justify-center">
@@ -667,7 +742,14 @@ export default function App() {
                 <Text className="text-xs font-bold text-gray-700 mb-1 ml-1">{t.auth.name_label}</Text>
                 <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-3 py-3">
                   <User size={18} color="#9ca3af" className="mr-2" />
-                  <TextInput className="flex-1 text-base text-gray-900" placeholder="John Doe" placeholderTextColor="#d1d5db"/>
+                  <TextInput 
+                    className="flex-1 text-base text-gray-900" 
+                    placeholder="John Doe" 
+                    placeholderTextColor="#d1d5db"
+                    value={name}
+                    onChangeText={setName}
+                    editable={!loading}
+                  />
                 </View>
               </View>
             )}
@@ -676,7 +758,16 @@ export default function App() {
               <Text className="text-xs font-bold text-gray-700 mb-1 ml-1">{t.auth.email_label}</Text>
               <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-3 py-3">
                 <Mail size={18} color="#9ca3af" className="mr-2" />
-                <TextInput className="flex-1 text-base text-gray-900" placeholder="user@example.com" keyboardType="email-address" autoCapitalize="none" placeholderTextColor="#d1d5db"/>
+                <TextInput 
+                  className="flex-1 text-base text-gray-900" 
+                  placeholder="user@example.com" 
+                  keyboardType="email-address" 
+                  autoCapitalize="none" 
+                  placeholderTextColor="#d1d5db"
+                  value={email}
+                  onChangeText={setEmail}
+                  editable={!loading}
+                />
               </View>
             </View>
 
@@ -684,20 +775,35 @@ export default function App() {
               <Text className="text-xs font-bold text-gray-700 mb-1 ml-1">{t.auth.pass_label}</Text>
               <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-3 py-3">
                 <Lock size={18} color="#9ca3af" className="mr-2" />
-                <TextInput className="flex-1 text-base text-gray-900" secureTextEntry={true} placeholder="••••••" placeholderTextColor="#d1d5db"/>
+                <TextInput 
+                  className="flex-1 text-base text-gray-900" 
+                  secureTextEntry={true} 
+                  placeholder="••••••" 
+                  placeholderTextColor="#d1d5db"
+                  value={password}
+                  onChangeText={setPassword}
+                  editable={!loading}
+                />
               </View>
             </View>
           </View>
 
           <TouchableOpacity 
-            onPress={handleAuthSuccess}
-            className="w-full bg-blue-600 py-4 rounded-xl mt-8 flex-row items-center justify-center shadow-md shadow-blue-200"
+            onPress={isLogin ? handleLogin : handleSignUp}
+            disabled={loading}
+            className={`w-full py-4 rounded-xl mt-8 flex-row items-center justify-center shadow-md ${loading ? 'bg-gray-400' : 'bg-blue-600'}`}
           >
-            <Text className="text-white font-bold text-lg">{isLogin ? t.auth.login_btn : t.auth.signup_btn}</Text>
-            <ChevronRight size={20} color="white" style={{marginLeft: 8}}/>
+            {loading ? (
+              <ActivityIndicator size="large" color="white" />
+            ) : (
+              <>
+                <Text className="text-white font-bold text-lg">{isLogin ? t.auth.login_btn : t.auth.signup_btn}</Text>
+                <ChevronRight size={20} color="white" style={{marginLeft: 8}}/>
+              </>
+            )}
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => setIsLogin(!isLogin)} className="mt-8">
+          <TouchableOpacity onPress={() => setIsLogin(!isLogin)} disabled={loading} className="mt-8">
             <Text className="text-center text-sm text-gray-500 font-medium">
               {isLogin ? t.auth.toggle_signup : t.auth.toggle_login}
             </Text>
