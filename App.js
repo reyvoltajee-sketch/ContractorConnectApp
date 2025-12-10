@@ -8,7 +8,6 @@ import { StatusBar } from 'expo-status-bar';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from './lib/supabase';
-import { styled } from 'nativewind';
 import { 
   Hammer, Home, MessageSquare, FileText, User, Camera, Send, 
   CheckCircle, Plus, Globe, DollarSign, Briefcase, Droplet, 
@@ -612,7 +611,7 @@ export default function App() {
 
   // --- COMPONENTS ---
 
-  const Avatar = ({ name, size = "w-10 h-10", verified, color="bg-gray-700", imgUrl }) => (
+  const Avatar = ({ name, size = "w-10 h-10", verified = false, color="bg-gray-700", imgUrl = null }) => (
     <View className={`relative ${size} rounded-full ${color} items-center justify-center shadow-sm overflow-hidden`}>
       {imgUrl ? (
         <Image source={{ uri: imgUrl }} className="w-full h-full" resizeMode="cover" />
