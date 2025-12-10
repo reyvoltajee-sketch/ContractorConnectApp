@@ -6,13 +6,29 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "node": "20.17.0",
+      "env": {
+        "NODE_VERSION": "20.17.0"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "node": "20.17.0",
+      "env": {
+        "NODE_VERSION": "20.17.0"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "node": "20.17.0",
+      "env": {
+        "NODE_VERSION": "20.17.0"
+      },
+      "ios": {
+        "simulator": false
+      },
+      "image": "macos-sonoma-14.6-xcode-16.1"
     }
   },
   "submit": {
