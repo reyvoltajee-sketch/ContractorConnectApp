@@ -3,6 +3,7 @@
     "name": "ContractorConnect",
     "slug": "contractorconnect",
     "version": "1.0.0",
+    "owner": "reinaldo4020",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -53,7 +54,9 @@
     "extra": {
       "eas": {
         "projectId": "624a235c-97c0-4364-a80e-a58a7d2187f5"
-      }
+      },
+      "supabaseUrl": "https://wtdkgbdrmilpbdqpynym.supabase.co",
+      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0ZGtnYmRybWlscGJkcXB5bnltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyMjc4NTMsImV4cCI6MjA4MDgwMzg1M30.Tdhhfo68DqXiO0jX65GNopuushplBBI5riDjqA7OILE"
     }
   }
 }
